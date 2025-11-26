@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Card, Skeleton, Typography, Row, Col, Button, Modal, Form, Input, message, Space, Divider } from 'antd';
 import { UserOutlined, MailOutlined, PhoneOutlined, HomeOutlined, GlobalOutlined, DeleteOutlined, EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
@@ -11,7 +12,7 @@ const USERS_API = 'https://dummyjson.com/users';
 
 async function fetchUserIds() {
     try {
-        const res = await fetch(`${USERS_API}?limit=30`); 
+        const res = await fetch(`${USERS_API}?limit=30`);
         if (!res.ok) throw new Error('Failed to fetch user list');
         const data = await res.json();
         return data.users.map(user => user.id.toString());
@@ -64,6 +65,10 @@ const StudentDetail = ({ student }) => {
     const [form] = Form.useForm();
     const [localStudent, setLocalStudent] = useState(student);
 
+    useEffect(() => {
+        setLocalStudent(student);
+    }, [student]);
+
     if (router.isFallback) {
         return (
             <div style={{ padding: '24px' }}>
@@ -84,39 +89,35 @@ const StudentDetail = ({ student }) => {
     }
 
     const showModal = () => {
+        const s = localStudent || student || {};
         form.setFieldsValue({
-            firstName: localStudent.firstName,
-            lastName: localStudent.lastName,
-            email: localStudent.email,
-            phone: localStudent.phone,
-            age: localStudent.age,
-            address: localStudent.address?.address, 
-            city: localStudent.address?.city,
-            postalCode: localStudent.address?.postalCode,
-            company: localStudent.company?.name,
-            university: localStudent.university,
+            firstName: s.firstName || '',
+            lastName: s.lastName || '',
+            email: s.email || '',
+            phone: s.phone || '',
+            age: s.age || '',
+            address: s.address?.address || '', 
+            city: s.address?.city || '',
+            postalCode: s.address?.postalCode || '',
+            company: s.company?.name || '',
+            university: s.university || '',
         });
         setIsModalVisible(true);
-    }
+    };
 
     const handleCancel = () => {
         setIsModalVisible(false);
     };
 
-    // --- NEW/FIXED: Simple Edit Simulation Handler ---
     const handleEditSimulation = (values) => {
-        // This is where a real API call (PUT/PATCH) would go.
-        // For simulation, we just show a success message and close the modal.
         console.log('Simulated form submission data:', values);
-        
         setIsModalVisible(false);
         message.success('Student details updated (simulated). The display data remains unchanged.');
     };
-    // --- END NEW/FIXED ---
 
 
     const handleDelete = () => {
-        if (window.confirm('Are you sure you want to delete this student?')) {
+        if (typeof window !== 'undefined' && window.confirm('Are you sure you want to delete this student?')) {
             message.warning('Student deleted (simulated). Going back to list.');
             router.push('/students');
         }
@@ -133,7 +134,7 @@ const StudentDetail = ({ student }) => {
                             Back
                         </Button>
                         <Button type="primary" onClick={showModal}>
-                            Edit (Simulate)
+                            Edit
                         </Button>
                         <Button danger onClick={handleDelete}>
                             Delete
@@ -159,7 +160,7 @@ const StudentDetail = ({ student }) => {
             {/* --- MODAL FORM --- */}
             <Modal
                 title="Edit Student Details (Simulation)"
-                visible={isModalVisible}
+                open={isModalVisible}
                 onCancel={handleCancel}
                 footer={[
                     <Button key="back" onClick={handleCancel}>
@@ -176,7 +177,7 @@ const StudentDetail = ({ student }) => {
                     layout="vertical"
                     name="edit_student"
                     // Link to the simulation handler
-                    onFinish={handleEditSimulation} 
+                    onFinish={handleEditSimulation}
                 >
                     <Row gutter={16}>
                         <Col span={12}>

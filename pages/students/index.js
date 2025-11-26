@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Table, Button, Input, Select, Space, Typography, Tag } from 'antd';
-// Removed 'next/link' as it causes resolution errors in this environment.
-// import Link from 'next/link'; 
+import { useRouter } from 'next/router';
 
 // Correcting the import path to ensure the AppContext is resolved correctly.
 import { useAppContext } from '../context/AppContext';
@@ -21,21 +20,19 @@ export async function getServerSideProps() {
         const categoryObjects = await majorsRes.json();
         const majorSlugs = categoryObjects.map(category => category.slug || category);
 
-        const usableMajors = majorSlugs.slice(0, 5);
-
         const students = studentsData.users.map(user => ({
             key: user.id,
             id: user.id,
             name: `${user.firstName} ${user.lastName}`,
             email: user.email,
             university: user.university,
-            major: usableMajors[user.id % usableMajors.length],
+            major: majorSlugs[user.id % majorSlugs.length],
         }));
 
         return {
             props: {
                 initialStudents: students,
-                majorNames: usableMajors,
+                majorNames: majorSlugs,
             },
         };
     } catch (error) {
@@ -50,11 +47,10 @@ export async function getServerSideProps() {
 }
 
 const StudentsIndex = ({ initialStudents, majorNames }) => {
-    // Get global state including theme
     const { selectedMajor, setSelectedMajor, theme } = useAppContext();
     const [searchTerm, setSearchTerm] = useState('');
+    const router = useRouter();
 
-    // Define theme-dependent styles for the container
     const containerStyle = {
         padding: 24,
         minHeight: '100vh',
@@ -63,7 +59,6 @@ const StudentsIndex = ({ initialStudents, majorNames }) => {
         transition: 'background-color 0.3s',
     };
 
-    // Text color helper
     const textColor = theme === 'dark' ? '#ffffff' : '#000000';
     const secondaryColor = theme === 'dark' ? '#a6a6a6' : '#666666';
 
@@ -102,8 +97,7 @@ const StudentsIndex = ({ initialStudents, majorNames }) => {
                 <Button
                     type="primary"
                     size="small"
-                    // Placeholder action since 'next/link' is not available
-                    onClick={() => console.log(`Viewing details for student ID: ${record.id}`)}
+                    onClick={() => router.push(`/students/${record.id}`)}
                 >
                     View Details
                 </Button>
@@ -124,7 +118,6 @@ const StudentsIndex = ({ initialStudents, majorNames }) => {
                     value={searchTerm}
                     style={{
                         width: 300,
-                        // Added dark mode styling to the search input
                         backgroundColor: theme === 'dark' ? '#303030' : '#fff',
                         color: textColor
                     }}
