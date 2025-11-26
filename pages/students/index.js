@@ -51,16 +51,19 @@ const StudentsIndex = ({ initialStudents, majorNames }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const router = useRouter();
 
+    // Simple theme check
+    const isDark = theme === 'dark';
+
     const containerStyle = {
         padding: 24,
         minHeight: '100vh',
-        backgroundColor: theme === 'dark' ? '#1f1f1f' : '#ffffff', // Dark background for dark mode
-        color: theme === 'dark' ? '#ffffff' : '#000000',           // White text for dark mode
-        transition: 'background-color 0.3s',
+        backgroundColor: 'var(--bg-primary)',
+        color: 'var(--text-primary)',
+        transition: 'background-color 0.3s ease, color 0.3s ease',
     };
 
-    const textColor = theme === 'dark' ? '#ffffff' : '#000000';
-    const secondaryColor = theme === 'dark' ? '#a6a6a6' : '#666666';
+    const textColor = 'var(--text-primary)';
+    const secondaryColor = 'var(--text-secondary)';
 
 
     const filteredStudents = useMemo(() => {
@@ -118,8 +121,6 @@ const StudentsIndex = ({ initialStudents, majorNames }) => {
                     value={searchTerm}
                     style={{
                         width: 300,
-                        backgroundColor: theme === 'dark' ? '#303030' : '#fff',
-                        color: textColor
                     }}
                 />
                 <Select
@@ -138,10 +139,8 @@ const StudentsIndex = ({ initialStudents, majorNames }) => {
             <Table
                 dataSource={filteredStudents}
                 columns={columns}
-                pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['5', '10', '20'] }}
+                pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['5', '10', '20'], color: 'red' }}
                 bordered
-
-                className={theme === 'dark' ? 'ant-table-dark' : ''}
             />
         </div>
     );

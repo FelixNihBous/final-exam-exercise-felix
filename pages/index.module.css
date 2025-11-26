@@ -1,0 +1,73 @@
+/* ===== CONTAINER ===== */
+.container {
+  padding: 40px 20px;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ===== TITLE ===== */
+.title {
+  color: var(--text-primary) !important;
+  margin-bottom: 16px !important;
+}
+
+/* ===== SUBTITLE ===== */
+.subtitle {
+  color: var(--text-secondary) !important;
+  font-size: 14px !important;
+}
+
+/* ===== CARD ===== */
+.card {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px var(--shadow) !important;
+  transition: all 0.3s ease;
+}
+
+/* Card header title color */
+.card :global(.ant-card-head-title) {
+  color: var(--text-primary) !important;
+}
+
+/* ===== SETTING ROW ===== */
+.setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.setting:last-child {
+  border-bottom: none;
+}
+
+.setting :global(.ant-typography) {
+  color: var(--text-primary) !important;
+}
+
+/* ===== BUTTONS ===== */
+.card :global(.ant-btn-default) {
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.card :global(.ant-btn-default):hover {
+  color: var(--text-primary) !important;
+  border-color: var(--text-primary) !important;
+  background-color: transparent !important;
+}
+
+/* ===== TEXT ===== */
+.card :global(.ant-typography) {
+  color: var(--text-primary) !important;
+}
+
+.card :global(.ant-typography-secondary) {
+  color: var(--text-secondary) !important;
+}

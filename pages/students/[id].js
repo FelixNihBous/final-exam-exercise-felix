@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { Card, Skeleton, Typography, Row, Col, Button, Modal, Form, Input, message, Space, Divider } from 'antd';
 import { UserOutlined, MailOutlined, PhoneOutlined, HomeOutlined, GlobalOutlined, DeleteOutlined, EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import Head from 'next/head';
+import { useAppContext } from '../context/AppContext';
 
 const { Title, Text } = Typography;
 
@@ -60,6 +61,29 @@ export async function getStaticProps(context) {
 
 const StudentDetail = ({ student }) => {
     const router = useRouter();
+    const { theme } = useAppContext();
+
+    const isDark = theme === 'dark';
+
+    // ===== THEME COLORS =====
+    const themeColors = {
+        light: {
+            bgPrimary: '#f0f2f5',
+            bgSecondary: '#ffffff',
+            textPrimary: '#000000',
+            textSecondary: '#666666',
+            borderColor: '#e8e8e8',
+        },
+        dark: {
+            bgPrimary: '#0d1117',
+            bgSecondary: '#161b22',
+            textPrimary: '#ffffff',
+            textSecondary: '#a6a6a6',
+            borderColor: '#30363d',
+        }
+    };
+
+    const colors = isDark ? themeColors.dark : themeColors.light;
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
@@ -112,122 +136,153 @@ const StudentDetail = ({ student }) => {
     const handleEditSimulation = (values) => {
         console.log('Simulated form submission data:', values);
         setIsModalVisible(false);
-        message.success('Student details updated (simulated). The display data remains unchanged.');
+        message.success('Student details updated (simulated). The display data remains unchanged.', 3);
     };
 
 
     const handleDelete = () => {
         if (typeof window !== 'undefined' && window.confirm('Are you sure you want to delete this student?')) {
-            message.warning('Student deleted (simulated). Going back to list.');
-            router.push('/students');
+            // show a success-style notification and delay navigation briefly
+            message.success('Student deleted (simulated). Returning to list...', 2);
+            setTimeout(() => router.push('/students'), 700);
         }
     };
 
     return (
         <>
-            <Card
-                style={{ maxWidth: 600, margin: '24px auto' }}
-                title="Student Detail"
-                extra={
-                    <Space>
-                        <Button onClick={() => router.push('/students')}>
-                            Back
-                        </Button>
-                        <Button type="primary" onClick={showModal}>
-                            Edit
-                        </Button>
-                        <Button danger onClick={handleDelete}>
-                            Delete
-                        </Button>
-                    </Space>
-                }
-            >
-                <Skeleton loading={router.isFallback} active>
-                    <Row gutter={[16, 16]}>
-                        <Col span={24}>
-                            <Title level={3}>🧑‍🎓 {localStudent.firstName} {localStudent.lastName}</Title>
-                            <Text><b>Email:</b> {localStudent.email}</Text><br />
-                            <Text><b>Phone:</b> {localStudent.phone}</Text><br />
-                            <Text><b>Age:</b> {localStudent.age}</Text><br />
-                            <Text><b>Address:</b> {localStudent.address?.address}, {localStudent.address?.city}, {localStudent.address?.postalCode}</Text><br />
-                            <Text><b>Company:</b> {localStudent.company?.name}</Text><br />
-                            <Text><b>University:</b> {localStudent.university}</Text><br />
-                        </Col>
-                    </Row>
-                </Skeleton>
-            </Card>
-
-            {/* --- MODAL FORM --- */}
-            <Modal
-                title="Edit Student Details (Simulation)"
-                open={isModalVisible}
-                onCancel={handleCancel}
-                footer={[
-                    <Button key="back" onClick={handleCancel}>
-                        Cancel
-                    </Button>,
-                    // Button to trigger the form submission
-                    <Button key="submit" type="primary" onClick={() => form.submit()}>
-                        Save Changes (Simulate)
-                    </Button>,
-                ]}
-            >
-                <Form
-                    form={form}
-                    layout="vertical"
-                    name="edit_student"
-                    // Link to the simulation handler
-                    onFinish={handleEditSimulation}
+            <div style={{
+                padding: 24,
+                minHeight: '100vh',
+                backgroundColor: colors.bgPrimary,
+                color: colors.textPrimary,
+                transition: 'all 0.3s ease'
+            }}>
+                <Card
+                    style={{ 
+                        maxWidth: 600, 
+                        margin: '24px auto',
+                        backgroundColor: colors.bgSecondary,
+                        borderColor: colors.borderColor,
+                        color: colors.textPrimary
+                    }}
+                    title="Student Detail"
+                    extra={
+                        <Space>
+                            <Button 
+                                onClick={() => router.push('/students')}
+                                style={{
+                                    borderColor: colors.borderColor,
+                                    color: colors.textPrimary,
+                                    backgroundColor: colors.bgSecondary
+                                }}
+                            >
+                                Back
+                            </Button>
+                            <Button type="primary" onClick={showModal}>
+                                Edit
+                            </Button>
+                            <Button 
+                                danger 
+                                onClick={handleDelete}
+                                style={{
+                                    borderColor: '#ff4d4f',
+                                    color: '#ffffff',
+                                    backgroundColor: '#ff4d4f'
+                                }}
+                            >
+                                Delete
+                            </Button>
+                        </Space>
+                    }
                 >
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
-                                <Input />
-                            </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                            <Form.Item name="lastName" label="Last Name" rules={[{ required: true }]}>
-                                <Input />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    
-                    <Form.Item name="email" label="Email" rules={[{ type: 'email' }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="phone" label="Phone">
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="age" label="Age">
-                        <Input type="number" />
-                    </Form.Item>
-                    
-                    <Divider orientation="left" style={{ margin: '16px 0 8px' }}>Location & Work</Divider>
+                    <Skeleton loading={router.isFallback} active>
+                        <Row gutter={[16, 16]}>
+                            <Col span={24}>
+                                <Title level={3} style={{ color: colors.textPrimary }}>🧑‍🎓 {localStudent.firstName} {localStudent.lastName}</Title>
+                                <Text style={{ color: colors.textPrimary }}><b>Email:</b> {localStudent.email}</Text><br />
+                                <Text style={{ color: colors.textPrimary }}><b>Phone:</b> {localStudent.phone}</Text><br />
+                                <Text style={{ color: colors.textPrimary }}><b>Age:</b> {localStudent.age}</Text><br />
+                                <Text style={{ color: colors.textPrimary }}><b>Address:</b> {localStudent.address?.address}, {localStudent.address?.city}, {localStudent.address?.postalCode}</Text><br />
+                                <Text style={{ color: colors.textPrimary }}><b>Company:</b> {localStudent.company?.name}</Text><br />
+                                <Text style={{ color: colors.textPrimary }}><b>University:</b> {localStudent.university}</Text><br />
+                            </Col>
+                        </Row>
+                    </Skeleton>
+                </Card>
 
-                    <Form.Item name="university" label="University">
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="company" label="Company Name">
-                        <Input />
-                    </Form.Item>
-                    
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <Form.Item name="address" label="Street Address">
-                                <Input />
-                            </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                            <Form.Item name="city" label="City">
-                                <Input />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Form.Item name="postalCode" label="Postal Code">
-                        <Input />
-                    </Form.Item>
-                </Form>
-            </Modal>
+                {/* --- MODAL FORM --- */}
+                <Modal
+                    title="Edit Student Details (Simulation)"
+                    open={isModalVisible}
+                    onCancel={handleCancel}
+                    style={{ 
+                        backgroundColor: colors.bgSecondary 
+                    }}
+                    footer={[
+                        <Button key="back" onClick={handleCancel}>
+                            Cancel
+                        </Button>,
+                        <Button key="submit" type="primary" onClick={() => form.submit()}>
+                            Save Changes (Simulate)
+                        </Button>,
+                    ]}
+                >
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        name="edit_student"
+                        onFinish={handleEditSimulation}
+                    >
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item name="lastName" label="Last Name" rules={[{ required: true }]}>
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        
+                        <Form.Item name="email" label="Email" rules={[{ type: 'email' }]}>
+                            <Input />
+                        </Form.Item>
+                        <Form.Item name="phone" label="Phone">
+                            <Input />
+                        </Form.Item>
+                        <Form.Item name="age" label="Age">
+                            <Input type="number" />
+                        </Form.Item>
+                        
+                        <Divider orientation="left" style={{ margin: '16px 0 8px' }}>Location & Work</Divider>
+
+                        <Form.Item name="university" label="University">
+                            <Input />
+                        </Form.Item>
+                        <Form.Item name="company" label="Company Name">
+                            <Input />
+                        </Form.Item>
+                        
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                <Form.Item name="address" label="Street Address">
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item name="city" label="City">
+                                    <Input />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Form.Item name="postalCode" label="Postal Code">
+                            <Input />
+                        </Form.Item>
+                    </Form>
+                </Modal>
+            </div>
         </>
     );
 };

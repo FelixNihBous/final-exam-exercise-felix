@@ -1,26 +1,202 @@
-@import "tailwindcss";
+/* ===== GLOBAL RESET ===== */
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
 
+/* ===== DEFAULT LIGHT THEME (on root) ===== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #f0f2f5;      /* Main background */
+  --bg-secondary: #ffffff;    /* Card background */
+  --text-primary: #000000;    /* Main text */
+  --text-secondary: #666666;  /* Secondary text */
+  --border-color: #e8e8e8;    /* Border color */
+  --shadow: rgba(0, 0, 0, 0.1); /* Shadow color */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ===== LIGHT THEME (when data-theme="light") ===== */
+html[data-theme="light"],
+[data-theme="light"] {
+  --bg-primary: #f0f2f5;      /* Main background */
+  --bg-secondary: #ffffff;    /* Card background */
+  --text-primary: #000000;    /* Main text */
+  --text-secondary: #666666;  /* Secondary text */
+  --border-color: #e8e8e8;    /* Border color */
+  --shadow: rgba(0, 0, 0, 0.1); /* Shadow color */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ===== DARK THEME (when data-theme="dark") ===== */
+html[data-theme="dark"],
+[data-theme="dark"] {
+  --bg-primary: #0d1117;      /* Main background */
+  --bg-secondary: #161b22;    /* Card background */
+  --text-primary: #ffffff;    /* Main text */
+  --text-secondary: #a6a6a6;  /* Secondary text */
+  --border-color: #30363d;    /* Border color */
+  --shadow: rgba(0, 0, 0, 0.3); /* Shadow color */
 }
 
+/* ===== BODY STYLING ===== */
+body, html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* ===== SMOOTH TRANSITIONS ===== */
+/* When theme changes, smoothly fade between colors */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ===== ANT DESIGN OVERRIDES ===== */
+/* Make sure Ant Design components respect our theme */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-card {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.ant-card-head {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.ant-table {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-table-thead > tr > th {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-table-tbody > tr > td {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-input,
+.ant-input-number,
+.ant-select-selector {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Target Ant input wrappers (Search, Affix) so placeholder/text remain visible */
+.ant-input-affix-wrapper,
+.ant-input-affix-wrapper .ant-input,
+.ant-input:hover,
+.ant-input:focus,
+input,
+textarea {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Placeholder color */
+.ant-input::placeholder,
+.ant-input-affix-wrapper ::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 1 !important;
+}
+
+/* Select and dropdown items */
+.ant-select .ant-select-selector,
+.ant-select-selection-item,
+.ant-select-selection-placeholder {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Table action buttons and tags */
+.ant-table-tbody > tr > td .ant-btn,
+.ant-table-tbody > tr > td .ant-tag {
+  color: var(--text-primary) !important;
+}
+
+/* Ensure pagination controls are visible */
+.ant-pagination,
+.ant-pagination .ant-pagination-item,
+.ant-pagination .ant-pagination-item a,
+.ant-pagination .ant-pagination-prev,
+.ant-pagination .ant-pagination-next {
+  color: var(--text-primary) !important;
+  background: transparent !important;
+}
+
+.ant-btn-default {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ===== TYPOGRAPHY & COMMON ELEMENTS ===== */
+/* Target common text elements without globally styling all divs/buttons */
+.ant-typography,
+.ant-typography *,
+p, h1, h2, h3, h4, h5, h6,
+span, li, a {
+  color: var(--text-primary) !important;
+}
+
+/* Ensure table cells and pagination use theme text color */
+.ant-table,
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td,
+.ant-pagination,
+.ant-pagination .ant-pagination-item,
+.ant-pagination .ant-pagination-item a {
+  color: var(--text-primary) !important;
+}
+
+/* Code blocks and inline code should use secondary text for contrast */
+code, pre, .ant-typography code {
+  color: var(--text-secondary) !important;
+}
+
+/* ===== ANT MESSAGE & NOTIFICATION (THEMED) ===== */
+/* Make message / notification popups follow theme variables so text is readable */
+.ant-message, .ant-message-notice, .ant-message-notice-content,
+.ant-notification, .ant-notification-notice, .ant-notification-notice-content {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 2px 8px var(--shadow) !important;
+}
+
+/* Keep the icon colors for success/info/warning/error recognizable */
+.ant-message-notice-success .anticon,
+.ant-notification-notice-success .anticon {
+  color: #52c41a !important;
+}
+.ant-message-notice-info .anticon,
+.ant-notification-notice-info .anticon {
+  color: #2f54eb !important;
+}
+.ant-message-notice-warning .anticon,
+.ant-notification-notice-warning .anticon {
+  color: #faad14 !important;
+}
+.ant-message-notice-error .anticon,
+.ant-notification-notice-error .anticon {
+  color: #ff4d4f !important;
+}
+
+/* Ensure message content text uses theme color */
+.ant-message-notice-content, .ant-notification-notice-content {
+  color: var(--text-primary) !important;
 }
