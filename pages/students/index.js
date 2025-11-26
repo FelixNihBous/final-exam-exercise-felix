@@ -2,8 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Table, Button, Input, Select, Space, Typography, Tag } from 'antd';
 import { useRouter } from 'next/router';
 
-// Correcting the import path to ensure the AppContext is resolved correctly.
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../../context/AppContext';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -51,8 +50,8 @@ const StudentsIndex = ({ initialStudents, majorNames }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const router = useRouter();
 
-    // Simple theme check
-    const isDark = theme === 'dark';
+    const textColor = 'var(--text-primary)';
+    const secondaryColor = 'var(--text-secondary)';
 
     const containerStyle = {
         padding: 24,
@@ -61,10 +60,6 @@ const StudentsIndex = ({ initialStudents, majorNames }) => {
         color: 'var(--text-primary)',
         transition: 'background-color 0.3s ease, color 0.3s ease',
     };
-
-    const textColor = 'var(--text-primary)';
-    const secondaryColor = 'var(--text-secondary)';
-
 
     const filteredStudents = useMemo(() => {
         return initialStudents.filter(student => {
@@ -85,9 +80,6 @@ const StudentsIndex = ({ initialStudents, majorNames }) => {
             render: major => {
                 const majorString = String(major || '');
                 let color = 'purple';
-                if (majorString.includes('smartphones')) color = 'blue';
-                else if (majorString.includes('groceries')) color = 'green';
-                else if (majorString.includes('fragrances')) color = 'gold';
                 return <Tag color={color}>{major}</Tag>;
             },
             filters: majorNames.map(name => ({ text: name, value: name })),
@@ -134,12 +126,18 @@ const StudentsIndex = ({ initialStudents, majorNames }) => {
                         <Option key={name} value={name}>{name}</Option>
                     ))}
                 </Select>
+
+                <button className="inline-flex items-center justify-center px-8 py-4 font-sans font-semibold tracking-wide text-white bg-blue-500 rounded-lg h-[60px] "
+                    onClick={() => router.push('/')}
+                >
+                    Back To Home
+                </button>
             </Space>
 
             <Table
                 dataSource={filteredStudents}
                 columns={columns}
-                pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['5', '10', '20'], color: 'red' }}
+                pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: ['5', '10', '20'] }}
                 bordered
             />
         </div>

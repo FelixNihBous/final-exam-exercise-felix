@@ -2,13 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Card, Skeleton, Typography, Row, Col, Button, Modal, Form, Input, message, Space, Divider } from 'antd';
-import { UserOutlined, MailOutlined, PhoneOutlined, HomeOutlined, GlobalOutlined, DeleteOutlined, EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { useAppContext } from '../../context/AppContext'; // Import the fixed hook
 import Head from 'next/head';
-import { useAppContext } from '../context/AppContext';
+import {DeleteOutlined, EditOutlined, ArrowLeftOutlined, MailOutlined, PhoneOutlined, HomeOutlined, GlobalOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
-// --- Data Fetching (Unchanged) ---
 const USERS_API = 'https://dummyjson.com/users';
 
 async function fetchUserIds() {
@@ -24,48 +23,65 @@ async function fetchUserIds() {
 }
 
 export async function getStaticPaths() {
-    const ids = await fetchUserIds();
-
-    const paths = ids.map((id) => ({
-        params: { id },
-    }));
-
-    return {
-        paths,
-        fallback: true,
-    };
-}
-
-export async function getStaticProps(context) {
-    const { id } = context.params;
-
     try {
-        const res = await fetch(`https://dummyjson.com/users/${id}`);
-        if (!res.ok) {
-            return { notFound: true };
-        }
-        const student = await res.json();
+        const res = await fetch(`${USERS_API}?limit=30`);
+
+        if (!res.ok) throw new Error("Failed to fetch");
+
+        const data = await res.json();
 
         return {
-            props: {
-                student,
-            },
-            revalidate: 10,
+            paths: data.users.map(u => ({ params: { id: String(u.id) }})),
+            fallback: true, // keep dynamic support
         };
+
     } catch (error) {
-        console.error('Error Fetching Student Data:', error);
-        return { notFound: true };
+        console.error("ERROR getStaticPaths:", error);
+
+        return {
+            paths: [],      // build will NOT fail
+            fallback: true, // dynamic fetch still works
+        };
     }
 }
 
 
+export async function getStaticProps({ params }) {
+    try {
+        const res = await fetch(`https://dummyjson.com/users/${params.id}`);
+
+        if (!res.ok) {
+            return { props: { student: null }};
+        }
+
+        const student = await res.json();
+
+        return {
+            props: { student },
+            revalidate: 10, // ISR enabled
+        };
+
+    } catch (error) {
+        console.error("Error Fetching Student Data:", error);
+
+        return {
+            props: { student: null }, // prevents build failure
+            revalidate: 10
+        };
+    }
+}
+
+
+
 const StudentDetail = ({ student }) => {
     const router = useRouter();
-    const { theme } = useAppContext();
+    
+    // FIX: Safely use the context hook directly now that the Provider is guaranteed
+    const { theme } = useAppContext(); 
 
     const isDark = theme === 'dark';
 
-    // ===== THEME COLORS =====
+    // ===== THEME COLORS (Remains the same) =====
     const themeColors = {
         light: {
             bgPrimary: '#f0f2f5',
@@ -142,7 +158,6 @@ const StudentDetail = ({ student }) => {
 
     const handleDelete = () => {
         if (typeof window !== 'undefined' && window.confirm('Are you sure you want to delete this student?')) {
-            // show a success-style notification and delay navigation briefly
             message.success('Student deleted (simulated). Returning to list...', 2);
             setTimeout(() => router.push('/students'), 700);
         }
@@ -150,6 +165,9 @@ const StudentDetail = ({ student }) => {
 
     return (
         <>
+            <Head>
+                <title>{localStudent.firstName} {localStudent.lastName} | Student Detail</title>
+            </Head>
             <div style={{
                 padding: 24,
                 minHeight: '100vh',
@@ -176,10 +194,10 @@ const StudentDetail = ({ student }) => {
                                     backgroundColor: colors.bgSecondary
                                 }}
                             >
-                                Back
+                                <ArrowLeftOutlined /> Back
                             </Button>
                             <Button type="primary" onClick={showModal}>
-                                Edit
+                                <EditOutlined /> Edit
                             </Button>
                             <Button 
                                 danger 
@@ -190,7 +208,7 @@ const StudentDetail = ({ student }) => {
                                     backgroundColor: '#ff4d4f'
                                 }}
                             >
-                                Delete
+                                <DeleteOutlined /> Delete
                             </Button>
                         </Space>
                     }
@@ -199,18 +217,18 @@ const StudentDetail = ({ student }) => {
                         <Row gutter={[16, 16]}>
                             <Col span={24}>
                                 <Title level={3} style={{ color: colors.textPrimary }}>🧑‍🎓 {localStudent.firstName} {localStudent.lastName}</Title>
-                                <Text style={{ color: colors.textPrimary }}><b>Email:</b> {localStudent.email}</Text><br />
-                                <Text style={{ color: colors.textPrimary }}><b>Phone:</b> {localStudent.phone}</Text><br />
+                                <Text style={{ color: colors.textPrimary }}><MailOutlined /> <b>Email:</b> {localStudent.email}</Text><br />
+                                <Text style={{ color: colors.textPrimary }}><PhoneOutlined /> <b>Phone:</b> {localStudent.phone}</Text><br />
                                 <Text style={{ color: colors.textPrimary }}><b>Age:</b> {localStudent.age}</Text><br />
-                                <Text style={{ color: colors.textPrimary }}><b>Address:</b> {localStudent.address?.address}, {localStudent.address?.city}, {localStudent.address?.postalCode}</Text><br />
+                                <Text style={{ color: colors.textPrimary }}><HomeOutlined /> <b>Address:</b> {localStudent.address?.address}, {localStudent.address?.city}, {localStudent.address?.postalCode}</Text><br />
                                 <Text style={{ color: colors.textPrimary }}><b>Company:</b> {localStudent.company?.name}</Text><br />
-                                <Text style={{ color: colors.textPrimary }}><b>University:</b> {localStudent.university}</Text><br />
+                                <Text style={{ color: colors.textPrimary }}><GlobalOutlined /> <b>University:</b> {localStudent.university}</Text><br />
                             </Col>
                         </Row>
                     </Skeleton>
                 </Card>
 
-                {/* --- MODAL FORM --- */}
+                {/* --- MODAL FORM --- (Remains the same) */}
                 <Modal
                     title="Edit Student Details (Simulation)"
                     open={isModalVisible}
